@@ -68,7 +68,7 @@ export default function TopRightNav({ items, className = "" }: Props) {
     >
       <div
         ref={containerRef}
-        className="relative flex flex-col items-end gap-1 sm:gap-1.5"
+        className="relative flex flex-col items-end gap-0.5 sm:gap-1 md:gap-1.5"
       >
         <span
           aria-hidden
@@ -93,7 +93,7 @@ export default function TopRightNav({ items, className = "" }: Props) {
             >
               <Link
                 href={item.href}
-                className={`inline-block transform-gpu text-right text-xs font-medium uppercase tracking-[-0.04em] sm:text-sm ${
+                className={`inline-block transform-gpu text-right text-[0.62rem] font-medium uppercase leading-none tracking-[-0.035em] sm:text-xs md:text-sm ${
                   item.active
                     ? "font-semibold text-black"
                     : "text-[#979797] hover:text-black"

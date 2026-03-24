@@ -17,7 +17,7 @@ import TopRightNav from "./TopRightNav";
 
 const NAV_ITEMS = [
   { label: "FRANCIS OLIVER", href: "/about", active: true },
-  { label: ".GALLERY", href: "/#gallery", active: false },
+  { label: ".GALLERY", href: "/gallery", active: false },
   { label: "RESUME", href: "/resume", active: false },
   { label: "PROJECTS", href: "/#projects", active: false },
 ] as const;
