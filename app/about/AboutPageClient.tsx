@@ -27,9 +27,9 @@ const INTRO =
 const INTRO_WORDS = INTRO.split(" ");
 
 const SOCIAL_LINKS = [
-  { label: "INSTAGRAM", href: "#" },
-  { label: "GITHUB", href: "#" },
-  { label: "LINKEDIN", href: "#" },
+  { label: "INSTAGRAM", href: "https://www.instagram.com/il.ahown/" },
+  { label: "GITHUB", href: "https://github.com/fxrncz" },
+  { label: "LINKEDIN", href: "https://www.linkedin.com/in/fxrncz/" },
 ] as const;
 
 /** After top-left block starts; top-right nav tweens begin here (seconds). */
@@ -317,6 +317,8 @@ export default function AboutPageClient() {
                   >
                     <Link
                       href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="social-inner relative inline-block text-[0.65rem] font-medium uppercase tracking-tight text-black sm:text-xs xl:text-sm after:absolute after:left-0 after:top-[calc(100%+2px)] after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-black after:transition-transform after:duration-300 after:ease-out hover:after:origin-left hover:after:scale-x-100"
                     >
                       {label}
