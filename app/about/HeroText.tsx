@@ -6,22 +6,34 @@ import PixelShaderOverlay from "../components/PixelShaderOverlay";
 
 const HERO_TEXT = "Francis Oliver \u2014";
 
+/** Kept in sync with the intro tween below (used for midpoint timing). */
+const HERO_INTRO_DURATION = 0.82;
+const HERO_INTRO_STAGGER = 0.035;
+
 type Props = {
   playIntro?: boolean;
   holdForIntro?: boolean;
+  /** Fires once ~halfway through the letter reveal (total span = stagger×(n−1) + duration). */
+  onIntroMidpoint?: () => void;
   onIntroComplete?: () => void;
 };
 
 export default function HeroText({
   playIntro = false,
   holdForIntro = false,
+  onIntroMidpoint,
   onIntroComplete,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const h1Ref = useRef<HTMLHeadingElement>(null);
   const introRanRef = useRef(false);
+  const onMidpointRef = useRef(onIntroMidpoint);
   const onCompleteRef = useRef(onIntroComplete);
   const [shaderEnabled, setShaderEnabled] = useState(false);
+
+  useEffect(() => {
+    onMidpointRef.current = onIntroMidpoint;
+  }, [onIntroMidpoint]);
 
   useEffect(() => {
     onCompleteRef.current = onIntroComplete;
@@ -71,11 +83,20 @@ export default function HeroText({
 
     wrap.style.visibility = "visible";
 
+    const n = inners.length;
+    const introSpan =
+      HERO_INTRO_STAGGER * Math.max(0, n - 1) + HERO_INTRO_DURATION;
+    const midpointDelay = introSpan * 0.5;
+
+    const midpointCall = gsap.delayedCall(midpointDelay, () => {
+      onMidpointRef.current?.();
+    });
+
     const tl = gsap.timeline();
     tl.to(inners, {
       yPercent: 0,
-      duration: 0.82,
-      stagger: 0.035,
+      duration: HERO_INTRO_DURATION,
+      stagger: HERO_INTRO_STAGGER,
       ease: "expo.out",
     }).call(
       () => {
@@ -91,6 +112,7 @@ export default function HeroText({
     );
 
     return () => {
+      midpointCall.kill();
       tl.kill();
     };
   }, [playIntro]);

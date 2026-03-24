@@ -2,7 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import gsap from "gsap";
 import HeroText from "./HeroText";
 import TalkButton from "./TalkButton";
@@ -24,6 +31,9 @@ const SOCIAL_LINKS = [
   { label: "GITHUB", href: "#" },
   { label: "LINKEDIN", href: "#" },
 ] as const;
+
+/** After top-left block starts; top-right nav tweens begin here (seconds). */
+const NAV_INTRO_DELAY_AFTER_LEFT = 0.48;
 
 export default function AboutPageClient() {
   const bottomBarFillRef = useRef<HTMLDivElement>(null);
@@ -47,7 +57,7 @@ export default function AboutPageClient() {
     }
   });
   const [playHeroIntro, setPlayHeroIntro] = useState(false);
-  const [contentReady, setContentReady] = useState(false);
+  const contentTlRef = useRef<ReturnType<typeof gsap.timeline> | null>(null);
 
   useLayoutEffect(() => {
     if (!fromLanding) return;
@@ -108,12 +118,10 @@ export default function AboutPageClient() {
     };
   }, [fromLanding]);
 
-  const handleHeroIntroComplete = useCallback(() => {
-    setContentReady(true);
-  }, []);
+  const handleHeroIntroMidpoint = useCallback(() => {
+    if (!fromLanding) return;
 
-  useEffect(() => {
-    if (!contentReady || !fromLanding) return;
+    contentTlRef.current?.kill();
 
     const profile = profileRef.current;
     const paraOuters =
@@ -139,8 +147,11 @@ export default function AboutPageClient() {
       });
     }
 
+    /* t=0 aligns with ~half of HeroText letter reveal (onIntroMidpoint). */
     const tl = gsap.timeline();
-    let t = 0.25;
+    contentTlRef.current = tl;
+    const leftStart = 0;
+    const navStart = NAV_INTRO_DELAY_AFTER_LEFT;
 
     if (profile) {
       tl.to(
@@ -150,10 +161,9 @@ export default function AboutPageClient() {
           duration: 0.82,
           ease: "power3.out",
         },
-        t
+        leftStart
       );
     }
-    t += 0.35;
 
     if (paraInners?.length) {
       tl.to(
@@ -164,10 +174,9 @@ export default function AboutPageClient() {
           stagger: 0.012,
           ease: "expo.out",
         },
-        t
+        leftStart
       );
     }
-    t += 0.25;
 
     if (talkBtn) {
       tl.to(
@@ -178,10 +187,9 @@ export default function AboutPageClient() {
           duration: 0.55,
           ease: "power2.out",
         },
-        t
+        leftStart
       );
     }
-    t += 0.15;
 
     if (socialInners?.length) {
       tl.to(
@@ -192,10 +200,9 @@ export default function AboutPageClient() {
           stagger: 0.04,
           ease: "expo.out",
         },
-        t
+        leftStart
       );
     }
-    t += 0.1;
 
     if (navInners?.length) {
       tl.to(
@@ -206,7 +213,7 @@ export default function AboutPageClient() {
           stagger: 0.055,
           ease: "expo.out",
         },
-        t
+        navStart
       );
     }
 
@@ -218,7 +225,7 @@ export default function AboutPageClient() {
           duration: 0.4,
           ease: "power2.out",
         },
-        t + 0.1
+        navStart
       );
     }
 
@@ -244,11 +251,14 @@ export default function AboutPageClient() {
         gsap.set(profile, { clearProps: "clipPath" });
       }
     });
+  }, [fromLanding]);
 
+  useEffect(() => {
     return () => {
-      tl.kill();
+      contentTlRef.current?.kill();
+      contentTlRef.current = null;
     };
-  }, [contentReady, fromLanding]);
+  }, []);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-white">
@@ -324,7 +334,7 @@ export default function AboutPageClient() {
       <HeroText
         playIntro={playHeroIntro}
         holdForIntro={fromLanding}
-        onIntroComplete={handleHeroIntroComplete}
+        onIntroMidpoint={handleHeroIntroMidpoint}
       />
 
       <section
