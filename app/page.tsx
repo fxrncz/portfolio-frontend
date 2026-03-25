@@ -495,7 +495,7 @@ export default function Home() {
             </li>
             <li>
               <a
-                href="#projects"
+                href="/projects"
                 className="text-xs font-medium uppercase tracking-tight text-white
                            hover:text-white/80 sm:text-sm lg:text-lg lg:tracking-tighter"
               >

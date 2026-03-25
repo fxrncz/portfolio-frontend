@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { label: "FRANCIS OLIVER", href: "/about", active: false },
   { label: ".GALLERY", href: "/gallery", active: true },
   { label: "RESUME", href: "/resume", active: false },
-  { label: "PROJECTS", href: "/#projects", active: false },
+  { label: "PROJECTS", href: "/projects", active: false },
 ] as const;
 
 export const metadata: Metadata = {

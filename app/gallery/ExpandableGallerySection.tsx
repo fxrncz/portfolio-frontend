@@ -51,28 +51,50 @@ function ToggleIcon({ open }: { open: boolean }) {
   );
 }
 
-function ClosedHoverImage({ src, alt }: ImageItem) {
+function ClosedHoverImage({
+  src,
+  alt,
+  open,
+  onImageClick,
+}: ImageItem & {
+  open: boolean;
+  onImageClick: () => void;
+}) {
+  const showFullColor = open;
+  const hoverRevealActive = !open;
+
   return (
-    <div className="group relative aspect-4/5 overflow-hidden">
+    <div
+      className="group relative aspect-4/5 cursor-pointer overflow-hidden"
+      onClick={(event) => {
+        event.stopPropagation();
+        onImageClick();
+      }}
+      role="presentation"
+    >
       <Image
         src={src}
         alt={alt}
         fill
-        className="object-cover grayscale"
+        className={`object-cover transition-[filter] duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          showFullColor ? "grayscale-0" : "grayscale"
+        }`}
         sizes={IMAGE_SIZES}
         quality={92}
       />
-      <div className="pointer-events-none absolute inset-0 opacity-0 [clip-path:inset(0_100%_100%_0)] transition-[clip-path,opacity] duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100 group-hover:[clip-path:inset(0_0_0_0)]">
-        <Image
-          src={src}
-          alt=""
-          fill
-          aria-hidden
-          className="scale-[1.035] object-cover transition-transform duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100"
-          sizes={IMAGE_SIZES}
-          quality={92}
-        />
-      </div>
+      {hoverRevealActive ? (
+        <div className="pointer-events-none absolute inset-0 opacity-0 [clip-path:inset(0_100%_100%_0)] transition-[clip-path,opacity] duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100 group-hover:[clip-path:inset(0_0_0_0)]">
+          <Image
+            src={src}
+            alt=""
+            fill
+            aria-hidden
+            className="scale-[1.035] object-cover transition-transform duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100"
+            sizes={IMAGE_SIZES}
+            quality={92}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -82,33 +104,50 @@ function OpenRevealImage({
   alt,
   delayMs,
   open,
-}: ImageItem & { delayMs: number; open: boolean }) {
+  onImageClick,
+}: ImageItem & {
+  delayMs: number;
+  open: boolean;
+  onImageClick: () => void;
+}) {
+  const showFullColor = open;
+  const hoverRevealActive = !open;
+
   return (
     <div
-      className={`group relative aspect-4/5 overflow-hidden transition-[clip-path,opacity] duration-900 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`group relative aspect-4/5 cursor-pointer overflow-hidden transition-[clip-path,opacity] duration-900 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         open ? "opacity-100 [clip-path:inset(0_0_0_0)]" : "opacity-0 [clip-path:inset(0_100%_100%_0)]"
       }`}
       style={{ transitionDelay: open ? `${delayMs}ms` : "0ms" }}
+      onClick={(event) => {
+        event.stopPropagation();
+        onImageClick();
+      }}
+      role="presentation"
     >
       <Image
         src={src}
         alt={alt}
         fill
-        className="object-cover grayscale"
+        className={`object-cover transition-[filter] duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          showFullColor ? "grayscale-0" : "grayscale"
+        }`}
         sizes={IMAGE_SIZES}
         quality={92}
       />
-      <div className="pointer-events-none absolute inset-0 opacity-0 [clip-path:inset(0_100%_100%_0)] transition-[clip-path,opacity] duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100 group-hover:[clip-path:inset(0_0_0_0)]">
-        <Image
-          src={src}
-          alt=""
-          fill
-          aria-hidden
-          className="scale-[1.035] object-cover transition-transform duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100"
-          sizes={IMAGE_SIZES}
-          quality={92}
-        />
-      </div>
+      {hoverRevealActive ? (
+        <div className="pointer-events-none absolute inset-0 opacity-0 [clip-path:inset(0_100%_100%_0)] transition-[clip-path,opacity] duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100 group-hover:[clip-path:inset(0_0_0_0)]">
+          <Image
+            src={src}
+            alt=""
+            fill
+            aria-hidden
+            className="scale-[1.035] object-cover transition-transform duration-1100 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100"
+            sizes={IMAGE_SIZES}
+            quality={92}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -121,22 +160,31 @@ export default function ExpandableGallerySection({
 }: Props) {
   const [open, setOpen] = useState(false);
 
+  const handleToggleHeader = () => {
+    setOpen((prev) => !prev);
+  };
+
+  /** From closed state: opens section; full color follows `open` (same transition as opening). */
+  const handleImageActivate = () => {
+    if (!open) setOpen(true);
+  };
+
   return (
     <>
-      <div
-        className="group/sectionlabel grid cursor-pointer gap-6 py-5 select-none sm:py-6 md:grid-cols-[minmax(12rem,1fr)_minmax(0,3fr)] md:gap-8 lg:py-7"
-        onClick={() => setOpen((prev) => !prev)}
-        role="button"
-        tabIndex={0}
-        aria-expanded={open}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            setOpen((prev) => !prev);
-          }
-        }}
-      >
-        <div className="grid grid-cols-[clamp(0.75rem,1.6vw,1.25rem)_1fr] gap-x-[clamp(2.25rem,6vw,5rem)] gap-y-1 sm:gap-y-2">
+      <div className="group/sectionlabel grid gap-6 py-5 select-none sm:py-6 md:grid-cols-[minmax(12rem,1fr)_minmax(0,3fr)] md:gap-8 lg:py-7">
+        <div
+          className="grid cursor-pointer grid-cols-[clamp(0.75rem,1.6vw,1.25rem)_1fr] gap-x-[clamp(2.25rem,6vw,5rem)] gap-y-1 sm:gap-y-2"
+          onClick={handleToggleHeader}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              handleToggleHeader();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-expanded={open}
+        >
           <ToggleIcon open={open} />
           <p className="cursor-pointer text-[clamp(1.05rem,2.2vw,1.7rem)] font-semibold uppercase leading-[0.95] tracking-[-0.04em] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/sectionlabel:translate-x-3">
             {title}
@@ -149,7 +197,13 @@ export default function ExpandableGallerySection({
 
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {closedImages.map((img) => (
-            <ClosedHoverImage key={img.src} src={img.src} alt={img.alt} />
+            <ClosedHoverImage
+              key={img.src}
+              src={img.src}
+              alt={img.alt}
+              open={open}
+              onImageClick={handleImageActivate}
+            />
           ))}
         </div>
       </div>
@@ -169,6 +223,7 @@ export default function ExpandableGallerySection({
                   alt={img.alt}
                   delayMs={idx * 140}
                   open={open}
+                  onImageClick={handleImageActivate}
                 />
               ))}
             </div>
