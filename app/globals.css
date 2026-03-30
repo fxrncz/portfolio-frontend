@@ -24,6 +24,12 @@ body {
     Arial, sans-serif;
 }
 
+/* Prevent horizontal document overflow (common with `100vw` / off-screen transforms). */
+html {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 /* Gallery route: hide native scrollbars while Lenis handles scrolling. */
 html.gallery-scroll,
 html.gallery-scroll body {

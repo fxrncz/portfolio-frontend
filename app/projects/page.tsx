@@ -16,8 +16,8 @@ export const metadata: Metadata = {
 
 export default function ProjectsPage() {
   return (
-    <div className="min-h-screen bg-white text-black">
-      <header className="relative px-3 pt-3 sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:px-10">
+    <div className="flex h-screen max-h-screen min-h-0 flex-col overflow-hidden bg-white text-black supports-[height:100dvh]:h-dvh supports-[height:100dvh]:max-h-dvh">
+      <header className="relative shrink-0 px-3 pt-3 sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:px-10">
         <h1
           className="text-[clamp(2.75rem,16vw,9rem)] font-semibold uppercase tracking-[-0.06em]"
           style={{ lineHeight: 0.82 }}
